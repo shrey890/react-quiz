@@ -1,0 +1,83 @@
+import React, { useEffect, useReducer } from "react";
+import Main from "./Main";
+import Header from "./Header";
+import Loader from "./Loader";
+import Error from "./Error";
+import Q from "./Q";
+import StartScreen from "./StartScreen";
+
+const initialState = {
+	questions: [],
+	status: "loading",
+	index: 0,
+	answer: null,
+	points: 0,
+};
+
+function reducer(state, action) {
+	switch (action.type) {
+		case "dataReceived":
+			return {
+				...state,
+				questions: action.payload,
+				status: "ready",
+			};
+		case "dataFailed":
+			return {
+				...state,
+				status: "error",
+			};
+		case "start":
+			return {
+				...state,
+				status: "active",
+			};
+		case "newAnswer":
+			const question = state.questions[state.index];
+			return {
+				...state,
+				answer: action.payload,
+				points:
+					action.payload === question.correctOption
+						? state.points + question.points
+						: state.points,
+			};
+		default:
+			throw new Error("Unknown action");
+	}
+}
+
+export default function App() {
+	const [{ questions, status, index, answer }, dispatch] = useReducer(
+		reducer,
+		initialState
+	);
+	const numQ = questions.length;
+
+	useEffect(() => {
+		fetch("http://localhost:8000/questions")
+			.then((res) => res.json())
+			.then((data) => dispatch({ type: "dataReceived", payload: data }))
+			.catch(() => dispatch({ type: "dataFailed" }));
+	}, []);
+
+	return (
+		<div className="app">
+			<Header />
+			<Main>
+				{status === "loading" && <Loader />}
+				{status === "error" && <Error />}
+				{status === "ready" && (
+					<StartScreen
+						numQ={numQ}
+						dispatch={dispatch}
+						onStart={() => dispatch({ type: "start" })}
+					/>
+				)}
+				{status === "active" && (
+					<Q question={questions[index]} dispatch={dispatch} answer={answer} />
+				)}
+			</Main>
+		</div>
+	);
+}
