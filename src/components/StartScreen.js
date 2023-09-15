@@ -5,7 +5,7 @@ function StartScreen({ numQ, dispatch }) {
 			<p style={{margin:'7px' , fontSize:'2rem'}}>{numQ} Question to Test Your React Mastery</p>
 			<button
 				className="btn btn-ui"
-				style={{margin:'10px'}}	
+				style={{margin:'20px'}}	
 				onClick={() => dispatch({ type: "start" })}
 			>
 				Let's Start
