@@ -8,9 +8,6 @@ import StartScreen from "./StartScreen";
 import NextButton from "./NextButton";
 import Progress from "./Progress";
 import Finish from "./Finish";
-// import Footer from "./Footer";
-// import Timer from "./Timer";
-// const SECS_PER_Q = 30;
 const initialState = {
 	questions: [],
 	status: "loading",
